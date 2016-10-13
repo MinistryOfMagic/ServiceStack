@@ -13,7 +13,7 @@ namespace ServiceStack.Auth
         public RedisAuthRepository(IRedisClientManagerFacade factory) : base(factory) { }
     }
 
-    public class RedisAuthRepository<TUserAuth, TUserAuthDetails> : IUserAuthRepository, IClearable
+    public class RedisAuthRepository<TUserAuth, TUserAuthDetails> : IUserAuthRepository, IClearable, IManageApiKeys
         where TUserAuth : class, IUserAuth
         where TUserAuthDetails : class, IUserAuthDetails
     {
@@ -26,30 +26,17 @@ namespace ServiceStack.Auth
 
         public string NamespacePrefix { get; set; }
 
-        private string UsePrefix { get { return NamespacePrefix ?? ""; } }
+        private string UsePrefix => NamespacePrefix ?? "";
 
         private string IndexUserAuthAndProviderIdsSet(long userAuthId) { return UsePrefix + "urn:UserAuth>UserOAuthProvider:" + userAuthId; }
 
         private string IndexProviderToUserIdHash(string provider) { return UsePrefix + "hash:ProviderUserId>OAuthProviderId:" + provider; }
 
-        private string IndexUserNameToUserId { get { return UsePrefix + "hash:UserAuth:UserName>UserId"; } }
+        private string IndexUserNameToUserId => UsePrefix + "hash:UserAuth:UserName>UserId";
 
-        private string IndexEmailToUserId { get { return UsePrefix + "hash:UserAuth:Email>UserId"; } }
+        private string IndexEmailToUserId => UsePrefix + "hash:UserAuth:Email>UserId";
 
-        private void ValidateNewUser(IUserAuth newUser, string password)
-        {
-            newUser.ThrowIfNull("newUser");
-            password.ThrowIfNullOrEmpty("password");
-
-            if (newUser.UserName.IsNullOrEmpty() && newUser.Email.IsNullOrEmpty())
-                throw new ArgumentNullException("UserName or Email is required");
-
-            if (!newUser.UserName.IsNullOrEmpty())
-            {
-                if (!HostContext.GetPlugin<AuthFeature>().IsValidUsername(newUser.UserName))
-                    throw new ArgumentException("UserName contains invalid characters", "UserName");
-            }
-        }
+        private string IndexUserAuthAndApiKeyIdsSet(long userAuthId) { return UsePrefix + "urn:UserAuth>ApiKey:" + userAuthId; }
 
         private void AssertNoExistingUser(IRedisClientFacade redis, IUserAuth newUser, IUserAuth exceptForExistingUser = null)
         {
@@ -58,20 +45,20 @@ namespace ServiceStack.Auth
                 var existingUser = GetUserAuthByUserName(redis, newUser.UserName);
                 if (existingUser != null
                     && (exceptForExistingUser == null || existingUser.Id != exceptForExistingUser.Id))
-                    throw new ArgumentException("User {0} already exists".Fmt(newUser.UserName));
+                    throw new ArgumentException(string.Format(ErrorMessages.UserAlreadyExistsTemplate1, newUser.UserName));
             }
             if (newUser.Email != null)
             {
                 var existingUser = GetUserAuthByUserName(redis, newUser.Email);
                 if (existingUser != null
                     && (exceptForExistingUser == null || existingUser.Id != exceptForExistingUser.Id))
-                    throw new ArgumentException("Email {0} already exists".Fmt(newUser.Email));
+                    throw new ArgumentException(string.Format(ErrorMessages.EmailAlreadyExistsTemplate1, newUser.Email));
             }
         }
 
         public virtual IUserAuth CreateUserAuth(IUserAuth newUser, string password)
         {
-            ValidateNewUser(newUser, password);
+            newUser.ValidateNewUser(password);
 
             using (var redis = factory.GetClient())
             {
@@ -108,7 +95,7 @@ namespace ServiceStack.Auth
 
         public IUserAuth UpdateUserAuth(IUserAuth existingUser, IUserAuth newUser, string password)
         {
-            ValidateNewUser(newUser, password);
+            newUser.ValidateNewUser(password);
 
             using (var redis = factory.GetClient())
             {
@@ -152,6 +139,27 @@ namespace ServiceStack.Auth
                 {
                     redis.SetEntryInHash(IndexEmailToUserId, newUser.Email, userId);
                 }
+
+                redis.Store(newUser);
+
+                return newUser;
+            }
+        }
+
+        public IUserAuth UpdateUserAuth(IUserAuth existingUser, IUserAuth newUser)
+        {
+            newUser.ValidateNewUser();
+
+            using (var redis = factory.GetClient())
+            {
+                AssertNoExistingUser(redis, newUser, existingUser);
+
+                newUser.Id = existingUser.Id;
+                newUser.PasswordHash = existingUser.PasswordHash;
+                newUser.Salt = existingUser.Salt;
+                newUser.DigestHa1Hash = existingUser.DigestHa1Hash;
+                newUser.CreatedDate = existingUser.CreatedDate;
+                newUser.ModifiedDate = DateTime.UtcNow;
 
                 redis.Store(newUser);
 
@@ -223,7 +231,8 @@ namespace ServiceStack.Auth
 
         public virtual void LoadUserAuth(IAuthSession session, IAuthTokens tokens)
         {
-            session.ThrowIfNull("session");
+            if (session == null)
+                throw new ArgumentNullException(nameof(session));
 
             var userAuth = GetUserAuth(session, tokens);
             LoadUserAuth(session, userAuth);
@@ -324,7 +333,8 @@ namespace ServiceStack.Auth
 
         public List<IUserAuthDetails> GetUserAuthDetails(string userAuthId)
         {
-            userAuthId.ThrowIfNullOrEmpty("userAuthId");
+            if (userAuthId == null)
+                throw new ArgumentNullException(nameof(userAuthId));
 
             using (var redis = factory.GetClient())
             {
@@ -420,6 +430,53 @@ namespace ServiceStack.Auth
             var idx = IndexProviderToUserIdHash(provider);
             var oAuthProviderId = redis.GetValueFromHash(idx, userId);
             return oAuthProviderId;
+        }
+
+        public void InitApiKeySchema()
+        {
+        }
+
+        public bool ApiKeyExists(string apiKey)
+        {
+            using (var redis = factory.GetClient())
+            {
+                return redis.As<ApiKey>().GetById(apiKey) != null;
+            }
+        }
+
+        public ApiKey GetApiKey(string apiKey)
+        {
+            using (var redis = factory.GetClient())
+            {
+                return redis.As<ApiKey>().GetById(apiKey);
+            }
+        }
+
+        public List<ApiKey> GetUserApiKeys(string userId)
+        {
+            using (var redis = factory.GetClient())
+            {
+                var idx = IndexUserAuthAndApiKeyIdsSet(long.Parse(userId));
+                var authProiverIds = redis.GetAllItemsFromSet(idx);
+                var apiKeys = redis.As<ApiKey>().GetByIds(authProiverIds);
+                return apiKeys
+                    .Where(x => x.CancelledDate == null 
+                        && (x.ExpiryDate == null || x.ExpiryDate >= DateTime.UtcNow))
+                    .OrderByDescending(x => x.CreatedDate).ToList();
+            }
+        }
+
+        public void StoreAll(IEnumerable<ApiKey> apiKeys)
+        {
+            using (var redis = factory.GetClient())
+            {
+                foreach (var apiKey in apiKeys)
+                {
+                    var userAuthId = long.Parse(apiKey.UserAuthId);
+                    redis.Store(apiKey);
+                    redis.AddItemToSet(IndexUserAuthAndApiKeyIdsSet(userAuthId), apiKey.Id.ToString());
+                }
+            }
         }
 
         public void Clear() { factory.Clear(); }

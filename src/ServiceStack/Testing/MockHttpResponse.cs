@@ -37,12 +37,17 @@ namespace ServiceStack.Testing
             this.Headers.Add(name, value);
         }
 
+        public string GetHeader(string name)
+        {
+            return this.Headers[name];
+        }
+
         public void Redirect(string url)
         {
             this.Headers.Add(HttpHeaders.Location, url.MapServerPath());
         }
 
-        public Stream OutputStream { get; private set; }
+        public Stream OutputStream { get; }
 
         public object Dto { get; set; }
 
@@ -91,7 +96,7 @@ namespace ServiceStack.Testing
 
         public bool KeepAlive { get; set; }
 
-        public Dictionary<string, object> Items { get; private set; }
+        public Dictionary<string, object> Items { get; }
 
         public void SetCookie(Cookie cookie)
         {            

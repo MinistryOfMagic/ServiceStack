@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Funq;
 using NUnit.Framework;
@@ -15,7 +16,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     public class ReplyAllAppHost : AppSelfHostBase
     {
         public ReplyAllAppHost()
-            : base(typeof(ReplyAllTests).Name, typeof(ReplyAllService).Assembly) { }
+            : base(typeof(ReplyAllTests).Name, typeof(ReplyAllService).Assembly)
+        { }
 
         public override void Configure(Container container)
         {
@@ -42,7 +44,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
         public static void AssertSingleDto(object dto)
         {
-            if (!(dto is BatchThrows || dto is BatchThrowsAsync || dto is NoRepeat || dto is HelloAll || dto is HelloAllAsync || dto is HelloGet || dto is HelloAllCustom || dto is HelloAllTransaction || dto is Request))
+            if (!(dto is BatchThrows || dto is BatchThrowsAsync || dto is NoRepeat || dto is HelloAll || dto is HelloAllAsync || dto is HelloAllVoid || dto is HelloAllVoidAsync || dto is HelloGet || dto is HelloAllCustom || dto is HelloAllTransaction || dto is Request))
                 throw new Exception("Invalid " + dto.GetType().Name);
         }
     }
@@ -88,6 +90,20 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
     public class HelloAllAsync : IReturn<HelloAllResponse>
     {
+        public string Name { get; set; }
+    }
+
+    public class HelloAllVoid : IReturnVoid
+    {
+        public static int Counter;
+
+        public string Name { get; set; }
+    }
+
+    public class HelloAllVoidAsync : IReturnVoid
+    {
+        public static int Counter;
+
         public string Name { get; set; }
     }
 
@@ -149,6 +165,17 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public object Get(HelloGet request)
         {
             return new HelloAllResponse { Result = "Hello, {0}!".Fmt(request.Name) };
+        }
+
+        public void Any(HelloAllVoid request)
+        {
+            HelloAllVoid.Counter++;
+        }
+
+        public async Task Any(HelloAllVoidAsync request)
+        {
+            HelloAllVoidAsync.Counter++;
+            await Task.FromResult(0);
         }
 
         [ReplyAllRequest]
@@ -299,6 +326,19 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         }
     }
 
+    public class ReplyAllCsvServiceClientTests : ReplyAllTests
+    {
+        public override IServiceClient CreateClient(string baseUri)
+        {
+            return new CsvServiceClient(baseUri);
+        }
+
+        public override IServiceClientAsync CreateClientAsync(string baseUri)
+        {
+            return new CsvServiceClient(baseUri);
+        }
+    }
+
     [TestFixture]
     public abstract class ReplyAllTests
     {
@@ -337,7 +377,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var client = CreateClientAsync(Config.AbsoluteBaseUri);
 
             var request = new HelloAllAsync { Name = "Foo" };
-            var response = await client.SendAsync(request);
+            var response = await client.SendAsync<HelloAllResponse>(request);
             Assert.That(response.Result, Is.EqualTo("Hello, Foo!"));
         }
 
@@ -409,6 +449,66 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Assert.That(results, Is.EquivalentTo(new[] {
                 "Hello, Foo!", "Hello, Bar!", "Hello, Baz!"
             }));
+        }
+
+        [Test]
+        public void Can_send_multi_HelloAllVoid()
+        {
+            var client = CreateClient(Config.AbsoluteBaseUri);
+
+            var requests = new[]
+            {
+                new HelloAllVoid { Name = "Foo" },
+                new HelloAllVoid { Name = "Bar" },
+                new HelloAllVoid { Name = "Baz" },
+            };
+
+            client.SendAllOneWay(requests);
+        }
+
+        [Test]
+        public void Can_send_PublishAll_HelloAllVoid()
+        {
+            var client = CreateClient(Config.AbsoluteBaseUri);
+
+            var requests = new[]
+            {
+                new HelloAllVoid { Name = "Foo" },
+                new HelloAllVoid { Name = "Bar" },
+                new HelloAllVoid { Name = "Baz" },
+            };
+
+            client.PublishAll(requests);
+        }
+
+        [Test]
+        public void Can_send_multi_HelloAllVoidAsync()
+        {
+            var client = CreateClient(Config.AbsoluteBaseUri);
+
+            var requests = new[]
+            {
+                new HelloAllVoidAsync { Name = "Foo" },
+                new HelloAllVoidAsync { Name = "Bar" },
+                new HelloAllVoidAsync { Name = "Baz" },
+            };
+
+            client.SendAllOneWay(requests);
+        }
+
+        [Test]
+        public async Task Can_send_PublishAllAsync_HelloAllVoidAsync()
+        {
+            var client = CreateClient(Config.AbsoluteBaseUri);
+
+            var requests = new[]
+            {
+                new HelloAllVoidAsync { Name = "Foo" },
+                new HelloAllVoidAsync { Name = "Bar" },
+                new HelloAllVoidAsync { Name = "Baz" },
+            };
+
+            await client.PublishAllAsync(requests);
         }
 
         [Test]
@@ -614,7 +714,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var requests = new[]
             {
                 new BatchThrowsAsync { Id = 1, Name = "Foo" },
-                new BatchThrowsAsync { Id = 2, Name = "Bar" }, 
+                new BatchThrowsAsync { Id = 2, Name = "Bar" },
                 new BatchThrowsAsync { Id = 3, Name = "Baz" },
             };
 

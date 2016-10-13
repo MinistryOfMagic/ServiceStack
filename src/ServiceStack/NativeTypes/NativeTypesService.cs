@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ServiceStack.DataAnnotations;
+using ServiceStack.Host;
 using ServiceStack.NativeTypes.CSharp;
 using ServiceStack.NativeTypes.FSharp;
 using ServiceStack.NativeTypes.Java;
+using ServiceStack.NativeTypes.Kotlin;
 using ServiceStack.NativeTypes.Swift;
 using ServiceStack.NativeTypes.TypeScript;
 using ServiceStack.NativeTypes.VbNet;
@@ -23,6 +26,7 @@ namespace ServiceStack.NativeTypes
         public string TypeScript { get; set; }
         public string TypeScriptDefinition { get; set; }
         public string Java { get; set; }
+        public string Kotlin { get; set; }
         public string Swift { get; set; }
     }
 
@@ -58,11 +62,16 @@ namespace ServiceStack.NativeTypes
     [Route("/types/java")]
     public class TypesJava : NativeTypesBase { }
 
+    [Exclude(Feature.Soap)]
+    [Route("/types/kotlin")]
+    public class TypesKotlin : NativeTypesBase { }
+
     public class NativeTypesBase
     {
         public string BaseUrl { get; set; }
         public bool? MakePartial { get; set; }
         public bool? MakeVirtual { get; set; }
+        public bool? MakeInternal { get; set; }
         public bool? AddReturnMarker { get; set; }
         public bool? AddDescriptionAsComments { get; set; }
         public bool? AddDataContractAttributes { get; set; }
@@ -79,10 +88,12 @@ namespace ServiceStack.NativeTypes
         public bool? SettersReturnThis { get; set; }
         public bool? MakePropertiesOptional { get; set; }
         public bool? ExportAsTypes { get; set; }
+        public bool? ExcludeNamespace { get; set; }
         public string AddDefaultXmlNamespace { get; set; }
         public string GlobalNamespace { get; set; }
         public string BaseClass { get; set; }
         public string Package { get; set; }
+        public List<string> AddNamespaces { get; set; }
         public List<string> DefaultNamespaces { get; set; }
         public List<string> DefaultImports { get; set; }
         public List<string> IncludeTypes { get; set; }
@@ -94,7 +105,7 @@ namespace ServiceStack.NativeTypes
     {
         MetadataTypesConfig GetConfig(NativeTypesBase req);
 
-        MetadataTypes GetMetadataTypes(IRequest req, MetadataTypesConfig config = null);
+        MetadataTypes GetMetadataTypes(IRequest req, MetadataTypesConfig config = null, Func<Operation, bool> predicate = null);
     }
 
 
@@ -113,8 +124,9 @@ namespace ServiceStack.NativeTypes
                 VbNet = new TypesVbNet().ToAbsoluteUri(),
                 TypeScript = new TypesTypeScript().ToAbsoluteUri(),
                 TypeScriptDefinition = new TypesTypeScriptDefinition().ToAbsoluteUri(),
-                Swift = new TypesSwift().ToAbsoluteUri(),
                 Java = new TypesJava().ToAbsoluteUri(),
+                Kotlin = new TypesKotlin().ToAbsoluteUri(),
+                Swift = new TypesSwift().ToAbsoluteUri(),
             };
             return response;
         }
@@ -168,6 +180,9 @@ namespace ServiceStack.NativeTypes
         [AddHeader(ContentType = MimeTypes.PlainText)]
         public object Any(TypesTypeScript request)
         {
+            if (request.BaseUrl == null)
+                request.BaseUrl = Request.GetBaseUrl();
+
             var typesConfig = NativeTypesMetadata.GetConfig(request);
             typesConfig.ExportAsTypes = true;
 
@@ -177,14 +192,14 @@ namespace ServiceStack.NativeTypes
         [AddHeader(ContentType = MimeTypes.PlainText)]
         public object Any(TypesTypeScriptDefinition request)
         {
+            if (request.BaseUrl == null)
+                request.BaseUrl = Request.GetBaseUrl();
+
             return GenerateTypeScript(request, NativeTypesMetadata.GetConfig(request));
         }
 
         public string GenerateTypeScript(NativeTypesBase request, MetadataTypesConfig typesConfig)
         {
-            if (request.BaseUrl == null)
-                request.BaseUrl = Request.GetBaseUrl();
-
             //Include SS types by removing ServiceStack namespaces
             if (typesConfig.AddServiceStackTypes)
                 typesConfig.IgnoreTypesInNamespaces = new List<string>();
@@ -249,15 +264,28 @@ namespace ServiceStack.NativeTypes
 
             metadataTypes.Types.RemoveAll(x => x.Name == "Service");
 
-            try
-            {
-                var java = new JavaGenerator(typesConfig).GetCode(metadataTypes, base.Request, NativeTypesMetadata);
-                return java;
-            }
-            catch (System.Exception)
-            {
-                throw;
-            }
+            var java = new JavaGenerator(typesConfig).GetCode(metadataTypes, base.Request, NativeTypesMetadata);
+            return java;
+        }
+
+        [AddHeader(ContentType = MimeTypes.PlainText)]
+        public object Any(TypesKotlin request)
+        {
+            if (request.BaseUrl == null)
+                request.BaseUrl = Request.GetBaseUrl();
+
+            var typesConfig = NativeTypesMetadata.GetConfig(request);
+
+            //Include SS types by removing ServiceStack namespaces
+            if (typesConfig.AddServiceStackTypes)
+                typesConfig.IgnoreTypesInNamespaces = new List<string>();
+
+            var metadataTypes = NativeTypesMetadata.GetMetadataTypes(Request, typesConfig);
+
+            metadataTypes.Types.RemoveAll(x => x.Name == "Service");
+
+            var java = new KotlinGenerator(typesConfig).GetCode(metadataTypes, base.Request, NativeTypesMetadata);
+            return java;
         }
     }
 }

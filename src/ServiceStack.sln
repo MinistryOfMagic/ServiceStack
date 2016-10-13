@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4EBD29DD-21A1-47B5-80DB-F9D58C91BED5}"
 EndProject
@@ -20,7 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{EB65E771
 		..\build\copy-sn.bat = ..\build\copy-sn.bat
 		..\build\copy.bat = ..\build\copy.bat
 		..\README.md = ..\README.md
-		..\docs\2015\release-notes.md = ..\docs\2015\release-notes.md
+		..\docs\2016\release-notes.md = ..\docs\2016\release-notes.md
 		..\NuGet\ServiceStack.Api.Swagger\servicestack.api.swagger.nuspec = ..\NuGet\ServiceStack.Api.Swagger\servicestack.api.swagger.nuspec
 		..\NuGet\ServiceStack.Authentication.MongoDb\servicestack.authentication.mongodb.nuspec = ..\NuGet\ServiceStack.Authentication.MongoDb\servicestack.authentication.mongodb.nuspec
 		..\NuGet\ServiceStack.Authentication.NHibernate\servicestack.authentication.nhibernate.nuspec = ..\NuGet\ServiceStack.Authentication.NHibernate\servicestack.authentication.nhibernate.nuspec
@@ -41,13 +41,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{EB65E771
 		..\NuGet\ServiceStack.Logging.EventLog\servicestack.logging.eventlog.nuspec = ..\NuGet\ServiceStack.Logging.EventLog\servicestack.logging.eventlog.nuspec
 		..\NuGet\ServiceStack.Logging.Log4Net\servicestack.logging.log4net.nuspec = ..\NuGet\ServiceStack.Logging.Log4Net\servicestack.logging.log4net.nuspec
 		..\NuGet\ServiceStack.Logging.NLog\servicestack.logging.nlog.nuspec = ..\NuGet\ServiceStack.Logging.NLog\servicestack.logging.nlog.nuspec
+		..\NuGet\ServiceStack.Logging.Slack\servicestack.logging.slack.nuspec = ..\NuGet\ServiceStack.Logging.Slack\servicestack.logging.slack.nuspec
 		..\NuGet\ServiceStack.MsgPack\servicestack.msgpack.nuspec = ..\NuGet\ServiceStack.MsgPack\servicestack.msgpack.nuspec
 		..\NuGet\ServiceStack.Mvc\servicestack.mvc.nuspec = ..\NuGet\ServiceStack.Mvc\servicestack.mvc.nuspec
 		..\NuGet\ServiceStack\servicestack.nuspec = ..\NuGet\ServiceStack\servicestack.nuspec
 		..\NuGet\ServiceStack.ProtoBuf\servicestack.protobuf.nuspec = ..\NuGet\ServiceStack.ProtoBuf\servicestack.protobuf.nuspec
 		..\NuGet\ServiceStack.RabbitMq\servicestack.rabbitmq.nuspec = ..\NuGet\ServiceStack.RabbitMq\servicestack.rabbitmq.nuspec
+		..\NuGet\ServiceStack.Razor.BuildTask\servicestack.razor.buildtask.nuspec = ..\NuGet\ServiceStack.Razor.BuildTask\servicestack.razor.buildtask.nuspec
 		..\NuGet\ServiceStack.Razor\servicestack.razor.nuspec = ..\NuGet\ServiceStack.Razor\servicestack.razor.nuspec
 		..\NuGet\ServiceStack.Server\servicestack.server.nuspec = ..\NuGet\ServiceStack.Server\servicestack.server.nuspec
+		..\NuGet\ServiceStack.Wire\servicestack.wire.nuspec = ..\NuGet\ServiceStack.Wire\servicestack.wire.nuspec
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Formats", "Formats", "{CBDE0575-D09B-4B4D-8C62-5E03E54F6BE8}"
@@ -60,9 +63,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AuthRepos", "AuthRepos", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Signed", "Signed", "{C57AF946-06A7-4CFC-BC4D-F9E7AE4FC5C8}"
 	ProjectSection(SolutionItems) = preProject
+		..\NuGet.Signed\ServiceStack.Api.Swagger.Signed\servicestack.api.swagger.signed.nuspec = ..\NuGet.Signed\ServiceStack.Api.Swagger.Signed\servicestack.api.swagger.signed.nuspec
+		..\NuGet.Signed\ServiceStack.Authentication.OAuth2.Signed\servicestack.authentication.oauth2.signed.nuspec = ..\NuGet.Signed\ServiceStack.Authentication.OAuth2.Signed\servicestack.authentication.oauth2.signed.nuspec
 		..\NuGet.Signed\ServiceStack.Client.Signed\servicestack.client.signed.nuspec = ..\NuGet.Signed\ServiceStack.Client.Signed\servicestack.client.signed.nuspec
 		..\NuGet.Signed\ServiceStack.Common.Signed\servicestack.common.signed.nuspec = ..\NuGet.Signed\ServiceStack.Common.Signed\servicestack.common.signed.nuspec
 		..\NuGet.Signed\ServiceStack.Mvc.Signed\servicestack.mvc.signed.nuspec = ..\NuGet.Signed\ServiceStack.Mvc.Signed\servicestack.mvc.signed.nuspec
+		..\NuGet.Signed\ServiceStack.ProtoBuf.Signed\servicestack.protobuf.signed.nuspec = ..\NuGet.Signed\ServiceStack.ProtoBuf.Signed\servicestack.protobuf.signed.nuspec
 		..\NuGet.Signed\ServiceStack.Razor.Signed\servicestack.razor.signed.nuspec = ..\NuGet.Signed\ServiceStack.Razor.Signed\servicestack.razor.signed.nuspec
 		..\NuGet.Signed\ServiceStack.Server.Signed\servicestack.server.signed.nuspec = ..\NuGet.Signed\ServiceStack.Server.Signed\servicestack.server.signed.nuspec
 		..\NuGet.Signed\ServiceStack.Signed\servicestack.signed.nuspec = ..\NuGet.Signed\ServiceStack.Signed\servicestack.signed.nuspec
@@ -72,12 +78,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{
 	ProjectSection(SolutionItems) = preProject
 		Templates\ClassLibraryTemplate.csproj = Templates\ClassLibraryTemplate.csproj
 		Templates\SilverlightTemplate.csproj = Templates\SilverlightTemplate.csproj
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pcl", "Pcl", "{5AE1CD9C-B726-4ABA-A8B7-E74435064783}"
-	ProjectSection(SolutionItems) = preProject
-		..\NuGet.Pcl\ServiceStack.Client.Pcl\servicestack.client.pcl.nuspec = ..\NuGet.Pcl\ServiceStack.Client.Pcl\servicestack.client.pcl.nuspec
-		..\NuGet.Pcl\ServiceStack.Interfaces.Pcl\servicestack.interfaces.pcl.nuspec = ..\NuGet.Pcl\ServiceStack.Interfaces.Pcl\servicestack.interfaces.pcl.nuspec
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Common.Tests", "..\tests\ServiceStack.Common.Tests\ServiceStack.Common.Tests.csproj", "{3FA9197A-462D-44CC-9AB3-61AF414D0B45}"
@@ -134,15 +134,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Authentication
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Authentication.RavenDb", "ServiceStack.Authentication.RavenDb\ServiceStack.Authentication.RavenDb.csproj", "{A30BD5B5-00C9-4B9D-9C9D-514B4A676FF3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Caching.AwsDynamoDb", "ServiceStack.Caching.AwsDynamoDb\ServiceStack.Caching.AwsDynamoDb.csproj", "{29C23E7D-F41E-42DD-8426-9B5254840450}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Caching.Azure", "ServiceStack.Caching.Azure\ServiceStack.Caching.Azure.csproj", "{08840867-041E-46A2-97C3-EA223161D942}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Caching.Memcached", "ServiceStack.Caching.Memcached\ServiceStack.Caching.Memcached.csproj", "{600612F3-15B4-45B5-9D39-06FA016B81C9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.RazorV4", "ServiceStack.RazorV4\ServiceStack.RazorV4.csproj", "{FB422BE1-9AC9-4506-A344-F814152EFA5B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.NetSerializer", "ServiceStack.NetSerializer\ServiceStack.NetSerializer.csproj", "{23202156-C4C7-4D03-8D92-E380C8B66EC8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.RabbitMq", "ServiceStack.RabbitMq\ServiceStack.RabbitMq.csproj", "{E940929C-9E76-41CD-BD09-08029FE9B440}"
 EndProject
@@ -158,17 +152,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Check.ServiceModel", "..\te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Interfaces", "ServiceStack.Interfaces\ServiceStack.Interfaces.csproj", "{55942102-033A-4DA8-A6AF-1DB7B2F34A2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.ServerV45", "ServiceStack.ServerV45\ServiceStack.ServerV45.csproj", "{F4BBC99C-DFF0-46DB-B75B-766C64B8CEE2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Authentication.RavenDbV45", "ServiceStack.Authentication.RavenDbV45\ServiceStack.Authentication.RavenDbV45.csproj", "{2E728F63-E19A-4FC7-9C30-46D1396852C1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Caching.AwsDynamoDbV2", "ServiceStack.Caching.AwsDynamoDbV2\ServiceStack.Caching.AwsDynamoDbV2.csproj", "{AA7027C6-2C94-4E44-83A2-275EEE473045}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.HttpClient", "ServiceStack.HttpClient\ServiceStack.HttpClient.csproj", "{C05DE4A1-84C5-481B-8BD4-C837A1303B01}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RazorRockstars.Web.Tests", "..\tests\RazorRockstars.Web.Tests\RazorRockstars.Web.Tests.csproj", "{1AD83DAD-3C69-4343-983E-074F0374EE80}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckMvc", "..\tests\CheckMvc\CheckMvc.csproj", "{50971470-179A-45D1-92C9-748DEFCBD9E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceStack.Wire", "ServiceStack.Wire\ServiceStack.Wire.csproj", "{0428D353-CD67-481F-877A-676E3BBCF903}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -594,21 +584,6 @@ Global
 		{A30BD5B5-00C9-4B9D-9C9D-514B4A676FF3}.Signed|Mixed Platforms.ActiveCfg = Signed|Any CPU
 		{A30BD5B5-00C9-4B9D-9C9D-514B4A676FF3}.Signed|Mixed Platforms.Build.0 = Signed|Any CPU
 		{A30BD5B5-00C9-4B9D-9C9D-514B4A676FF3}.Signed|x86.ActiveCfg = Signed|Any CPU
-		{29C23E7D-F41E-42DD-8426-9B5254840450}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{29C23E7D-F41E-42DD-8426-9B5254840450}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{29C23E7D-F41E-42DD-8426-9B5254840450}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{29C23E7D-F41E-42DD-8426-9B5254840450}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{29C23E7D-F41E-42DD-8426-9B5254840450}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{29C23E7D-F41E-42DD-8426-9B5254840450}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{29C23E7D-F41E-42DD-8426-9B5254840450}.Release|Any CPU.Build.0 = Release|Any CPU
-		{29C23E7D-F41E-42DD-8426-9B5254840450}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{29C23E7D-F41E-42DD-8426-9B5254840450}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{29C23E7D-F41E-42DD-8426-9B5254840450}.Release|x86.ActiveCfg = Release|Any CPU
-		{29C23E7D-F41E-42DD-8426-9B5254840450}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
-		{29C23E7D-F41E-42DD-8426-9B5254840450}.Signed|Any CPU.Build.0 = Signed|Any CPU
-		{29C23E7D-F41E-42DD-8426-9B5254840450}.Signed|Mixed Platforms.ActiveCfg = Signed|Any CPU
-		{29C23E7D-F41E-42DD-8426-9B5254840450}.Signed|Mixed Platforms.Build.0 = Signed|Any CPU
-		{29C23E7D-F41E-42DD-8426-9B5254840450}.Signed|x86.ActiveCfg = Signed|Any CPU
 		{08840867-041E-46A2-97C3-EA223161D942}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{08840867-041E-46A2-97C3-EA223161D942}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08840867-041E-46A2-97C3-EA223161D942}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -639,36 +614,6 @@ Global
 		{600612F3-15B4-45B5-9D39-06FA016B81C9}.Signed|Mixed Platforms.ActiveCfg = Signed|Any CPU
 		{600612F3-15B4-45B5-9D39-06FA016B81C9}.Signed|Mixed Platforms.Build.0 = Signed|Any CPU
 		{600612F3-15B4-45B5-9D39-06FA016B81C9}.Signed|x86.ActiveCfg = Signed|Any CPU
-		{FB422BE1-9AC9-4506-A344-F814152EFA5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FB422BE1-9AC9-4506-A344-F814152EFA5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FB422BE1-9AC9-4506-A344-F814152EFA5B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{FB422BE1-9AC9-4506-A344-F814152EFA5B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{FB422BE1-9AC9-4506-A344-F814152EFA5B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{FB422BE1-9AC9-4506-A344-F814152EFA5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FB422BE1-9AC9-4506-A344-F814152EFA5B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FB422BE1-9AC9-4506-A344-F814152EFA5B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{FB422BE1-9AC9-4506-A344-F814152EFA5B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{FB422BE1-9AC9-4506-A344-F814152EFA5B}.Release|x86.ActiveCfg = Release|Any CPU
-		{FB422BE1-9AC9-4506-A344-F814152EFA5B}.Signed|Any CPU.ActiveCfg = Release|Any CPU
-		{FB422BE1-9AC9-4506-A344-F814152EFA5B}.Signed|Any CPU.Build.0 = Release|Any CPU
-		{FB422BE1-9AC9-4506-A344-F814152EFA5B}.Signed|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{FB422BE1-9AC9-4506-A344-F814152EFA5B}.Signed|Mixed Platforms.Build.0 = Release|Any CPU
-		{FB422BE1-9AC9-4506-A344-F814152EFA5B}.Signed|x86.ActiveCfg = Release|Any CPU
-		{23202156-C4C7-4D03-8D92-E380C8B66EC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{23202156-C4C7-4D03-8D92-E380C8B66EC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{23202156-C4C7-4D03-8D92-E380C8B66EC8}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{23202156-C4C7-4D03-8D92-E380C8B66EC8}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{23202156-C4C7-4D03-8D92-E380C8B66EC8}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{23202156-C4C7-4D03-8D92-E380C8B66EC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{23202156-C4C7-4D03-8D92-E380C8B66EC8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{23202156-C4C7-4D03-8D92-E380C8B66EC8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{23202156-C4C7-4D03-8D92-E380C8B66EC8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{23202156-C4C7-4D03-8D92-E380C8B66EC8}.Release|x86.ActiveCfg = Release|Any CPU
-		{23202156-C4C7-4D03-8D92-E380C8B66EC8}.Signed|Any CPU.ActiveCfg = Release|Any CPU
-		{23202156-C4C7-4D03-8D92-E380C8B66EC8}.Signed|Any CPU.Build.0 = Release|Any CPU
-		{23202156-C4C7-4D03-8D92-E380C8B66EC8}.Signed|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{23202156-C4C7-4D03-8D92-E380C8B66EC8}.Signed|Mixed Platforms.Build.0 = Release|Any CPU
-		{23202156-C4C7-4D03-8D92-E380C8B66EC8}.Signed|x86.ActiveCfg = Release|Any CPU
 		{E940929C-9E76-41CD-BD09-08029FE9B440}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E940929C-9E76-41CD-BD09-08029FE9B440}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E940929C-9E76-41CD-BD09-08029FE9B440}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -774,51 +719,6 @@ Global
 		{55942102-033A-4DA8-A6AF-1DB7B2F34A2D}.Signed|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{55942102-033A-4DA8-A6AF-1DB7B2F34A2D}.Signed|Mixed Platforms.Build.0 = Release|Any CPU
 		{55942102-033A-4DA8-A6AF-1DB7B2F34A2D}.Signed|x86.ActiveCfg = Release|Any CPU
-		{F4BBC99C-DFF0-46DB-B75B-766C64B8CEE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F4BBC99C-DFF0-46DB-B75B-766C64B8CEE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F4BBC99C-DFF0-46DB-B75B-766C64B8CEE2}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{F4BBC99C-DFF0-46DB-B75B-766C64B8CEE2}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{F4BBC99C-DFF0-46DB-B75B-766C64B8CEE2}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{F4BBC99C-DFF0-46DB-B75B-766C64B8CEE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F4BBC99C-DFF0-46DB-B75B-766C64B8CEE2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F4BBC99C-DFF0-46DB-B75B-766C64B8CEE2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{F4BBC99C-DFF0-46DB-B75B-766C64B8CEE2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{F4BBC99C-DFF0-46DB-B75B-766C64B8CEE2}.Release|x86.ActiveCfg = Release|Any CPU
-		{F4BBC99C-DFF0-46DB-B75B-766C64B8CEE2}.Signed|Any CPU.ActiveCfg = Release|Any CPU
-		{F4BBC99C-DFF0-46DB-B75B-766C64B8CEE2}.Signed|Any CPU.Build.0 = Release|Any CPU
-		{F4BBC99C-DFF0-46DB-B75B-766C64B8CEE2}.Signed|Mixed Platforms.ActiveCfg = Signed|Any CPU
-		{F4BBC99C-DFF0-46DB-B75B-766C64B8CEE2}.Signed|Mixed Platforms.Build.0 = Signed|Any CPU
-		{F4BBC99C-DFF0-46DB-B75B-766C64B8CEE2}.Signed|x86.ActiveCfg = Release|Any CPU
-		{2E728F63-E19A-4FC7-9C30-46D1396852C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2E728F63-E19A-4FC7-9C30-46D1396852C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2E728F63-E19A-4FC7-9C30-46D1396852C1}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{2E728F63-E19A-4FC7-9C30-46D1396852C1}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{2E728F63-E19A-4FC7-9C30-46D1396852C1}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{2E728F63-E19A-4FC7-9C30-46D1396852C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2E728F63-E19A-4FC7-9C30-46D1396852C1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2E728F63-E19A-4FC7-9C30-46D1396852C1}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{2E728F63-E19A-4FC7-9C30-46D1396852C1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{2E728F63-E19A-4FC7-9C30-46D1396852C1}.Release|x86.ActiveCfg = Release|Any CPU
-		{2E728F63-E19A-4FC7-9C30-46D1396852C1}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
-		{2E728F63-E19A-4FC7-9C30-46D1396852C1}.Signed|Any CPU.Build.0 = Signed|Any CPU
-		{2E728F63-E19A-4FC7-9C30-46D1396852C1}.Signed|Mixed Platforms.ActiveCfg = Signed|Any CPU
-		{2E728F63-E19A-4FC7-9C30-46D1396852C1}.Signed|Mixed Platforms.Build.0 = Signed|Any CPU
-		{2E728F63-E19A-4FC7-9C30-46D1396852C1}.Signed|x86.ActiveCfg = Signed|Any CPU
-		{AA7027C6-2C94-4E44-83A2-275EEE473045}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AA7027C6-2C94-4E44-83A2-275EEE473045}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AA7027C6-2C94-4E44-83A2-275EEE473045}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{AA7027C6-2C94-4E44-83A2-275EEE473045}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{AA7027C6-2C94-4E44-83A2-275EEE473045}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{AA7027C6-2C94-4E44-83A2-275EEE473045}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AA7027C6-2C94-4E44-83A2-275EEE473045}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AA7027C6-2C94-4E44-83A2-275EEE473045}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{AA7027C6-2C94-4E44-83A2-275EEE473045}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{AA7027C6-2C94-4E44-83A2-275EEE473045}.Release|x86.ActiveCfg = Release|Any CPU
-		{AA7027C6-2C94-4E44-83A2-275EEE473045}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
-		{AA7027C6-2C94-4E44-83A2-275EEE473045}.Signed|Any CPU.Build.0 = Signed|Any CPU
-		{AA7027C6-2C94-4E44-83A2-275EEE473045}.Signed|Mixed Platforms.ActiveCfg = Signed|Any CPU
-		{AA7027C6-2C94-4E44-83A2-275EEE473045}.Signed|Mixed Platforms.Build.0 = Signed|Any CPU
-		{AA7027C6-2C94-4E44-83A2-275EEE473045}.Signed|x86.ActiveCfg = Signed|Any CPU
 		{C05DE4A1-84C5-481B-8BD4-C837A1303B01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C05DE4A1-84C5-481B-8BD4-C837A1303B01}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C05DE4A1-84C5-481B-8BD4-C837A1303B01}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -870,13 +770,30 @@ Global
 		{50971470-179A-45D1-92C9-748DEFCBD9E5}.Signed|Mixed Platforms.Build.0 = Release|Any CPU
 		{50971470-179A-45D1-92C9-748DEFCBD9E5}.Signed|x86.ActiveCfg = Release|Any CPU
 		{50971470-179A-45D1-92C9-748DEFCBD9E5}.Signed|x86.Build.0 = Release|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Debug|x86.Build.0 = Debug|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Release|x86.ActiveCfg = Release|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Release|x86.Build.0 = Release|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Signed|Any CPU.ActiveCfg = Release|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Signed|Any CPU.Build.0 = Release|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Signed|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Signed|Mixed Platforms.Build.0 = Release|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Signed|x86.ActiveCfg = Release|Any CPU
+		{0428D353-CD67-481F-877A-676E3BBCF903}.Signed|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C57AF946-06A7-4CFC-BC4D-F9E7AE4FC5C8} = {EB65E771-6C97-4D64-8E11-FD88AE48A41A}
-		{5AE1CD9C-B726-4ABA-A8B7-E74435064783} = {EB65E771-6C97-4D64-8E11-FD88AE48A41A}
 		{3FA9197A-462D-44CC-9AB3-61AF414D0B45} = {4EBD29DD-21A1-47B5-80DB-F9D58C91BED5}
 		{94A33BC4-AC22-49A3-A38E-2ABFCD997ABA} = {4EBD29DD-21A1-47B5-80DB-F9D58C91BED5}
 		{A5646013-C243-453F-A2B6-3B6870A9637D} = {4EBD29DD-21A1-47B5-80DB-F9D58C91BED5}
@@ -897,18 +814,15 @@ Global
 		{16E42781-8872-4468-9B7A-9140778A4D5E} = {2E143186-E565-48B8-A8AE-6FE03B70FE68}
 		{E5C9B657-D8AF-4DF2-9BB8-C09AA8F5CBE2} = {2E143186-E565-48B8-A8AE-6FE03B70FE68}
 		{A30BD5B5-00C9-4B9D-9C9D-514B4A676FF3} = {2E143186-E565-48B8-A8AE-6FE03B70FE68}
-		{29C23E7D-F41E-42DD-8426-9B5254840450} = {515043B6-1FFD-4CBF-8916-23B82C67CF8C}
 		{08840867-041E-46A2-97C3-EA223161D942} = {515043B6-1FFD-4CBF-8916-23B82C67CF8C}
 		{600612F3-15B4-45B5-9D39-06FA016B81C9} = {515043B6-1FFD-4CBF-8916-23B82C67CF8C}
-		{23202156-C4C7-4D03-8D92-E380C8B66EC8} = {CBDE0575-D09B-4B4D-8C62-5E03E54F6BE8}
 		{45DAECA2-659E-40D7-AA70-8EB4A56B2331} = {4EBD29DD-21A1-47B5-80DB-F9D58C91BED5}
 		{F709A373-6FD5-4415-B2ED-2520EA7CC568} = {4EBD29DD-21A1-47B5-80DB-F9D58C91BED5}
 		{9982317F-831C-478B-9CC3-57F888BCD97A} = {4EBD29DD-21A1-47B5-80DB-F9D58C91BED5}
 		{213EF4BA-786A-432F-B147-5702B18DE3CC} = {4EBD29DD-21A1-47B5-80DB-F9D58C91BED5}
-		{2E728F63-E19A-4FC7-9C30-46D1396852C1} = {2E143186-E565-48B8-A8AE-6FE03B70FE68}
-		{AA7027C6-2C94-4E44-83A2-275EEE473045} = {515043B6-1FFD-4CBF-8916-23B82C67CF8C}
 		{1AD83DAD-3C69-4343-983E-074F0374EE80} = {4EBD29DD-21A1-47B5-80DB-F9D58C91BED5}
 		{50971470-179A-45D1-92C9-748DEFCBD9E5} = {4EBD29DD-21A1-47B5-80DB-F9D58C91BED5}
+		{0428D353-CD67-481F-877A-676E3BBCF903} = {CBDE0575-D09B-4B4D-8C62-5E03E54F6BE8}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = ..\tests\RazorRockstars.Console\RazorRockstars.Console.csproj

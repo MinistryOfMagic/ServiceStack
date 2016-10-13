@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
 using System.Net;
 using System.Threading;
+using System.Web;
 using Funq;
 using Raven.Client;
 using Raven.Client.Document;
@@ -49,7 +50,16 @@ namespace ServiceStack.AuthWeb.Tests
         public override void Configure(Container container)
         {
             Plugins.Add(new RazorFormat());
-            Plugins.Add(new ServerEventsFeature());
+            Plugins.Add(new ServerEventsFeature
+            {
+                WriteEvent = (res, frame) =>
+                {
+                    var aspRes = (HttpResponseBase)res.OriginalResponse;
+                    var bytes = frame.ToUtf8Bytes();
+                    aspRes.OutputStream.WriteAsync(bytes, 0, bytes.Length)
+                        .Then(_ => aspRes.OutputStream.FlushAsync());
+                }
+            });
 
             container.Register(new DataSource());
 
@@ -124,6 +134,8 @@ namespace ServiceStack.AuthWeb.Tests
                         //        ? HttpResult.Redirect("https://youtu.be/dQw4w9WgXcQ")
                         //        : null
                     },
+                    new JwtAuthProvider(appSettings), 
+                    new ApiKeyAuthProvider(appSettings), 
                     new TwitterAuthProvider(appSettings),       //Sign-in with Twitter
                     new FacebookAuthProvider(appSettings),      //Sign-in with Facebook
                     new DigestAuthProvider(appSettings),        //Sign-in with Digest Auth
@@ -360,6 +372,16 @@ namespace ServiceStack.AuthWeb.Tests
     public class CustomUserSession : AuthUserSession
     {
         public string ProfileUrl64 { get; set; }
+
+        public override bool HasPermission(string permission, IAuthRepository authRepo)
+        {
+            return base.HasPermission(permission, authRepo);
+        }
+
+        public override bool HasRole(string role, IAuthRepository authRepo)
+        {
+            return base.HasRole(role, authRepo);
+        }
 
         public override void OnAuthenticated(IServiceBase authService, IAuthSession session, IAuthTokens tokens, Dictionary<string, string> authInfo)
         {

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using ServiceStack.Text;
 using ServiceStack.Web;
@@ -99,6 +100,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             AssertResponse<FileUploadResponse>((HttpWebResponse)webResponse, r =>
             {
                 var expectedContents = new StreamReader(uploadFile.OpenRead()).ReadToEnd();
+                Assert.That(r.Name, Is.EqualTo("file"));
                 Assert.That(r.FileName, Is.EqualTo(uploadFile.Name));
                 Assert.That(r.ContentLength, Is.EqualTo(uploadFile.Length));
                 Assert.That(r.ContentType, Is.EqualTo(MimeTypes.GetMimeType(uploadFile.Name)));
@@ -119,6 +121,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
 
             var expectedContents = new StreamReader(uploadFile.OpenRead()).ReadToEnd();
+            Assert.That(response.Name, Is.EqualTo("file"));
             Assert.That(response.FileName, Is.EqualTo(uploadFile.Name));
             Assert.That(response.ContentLength, Is.EqualTo(uploadFile.Length));
             Assert.That(response.ContentType, Is.EqualTo(MimeTypes.GetMimeType(uploadFile.Name)));
@@ -136,6 +139,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var response = client.PostFileWithRequest<FileUploadResponse>(ListeningOn + "/fileuploads", uploadFile, request);
 
             var expectedContents = new StreamReader(uploadFile.OpenRead()).ReadToEnd();
+            Assert.That(response.Name, Is.EqualTo("upload"));
             Assert.That(response.FileName, Is.EqualTo(uploadFile.Name));
             Assert.That(response.ContentLength, Is.EqualTo(uploadFile.Length));
             Assert.That(response.Contents, Is.EqualTo(expectedContents));
@@ -156,11 +160,89 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 uploadFile, request);
 
             var expectedContents = new StreamReader(uploadFile.OpenRead()).ReadToEnd();
+            Assert.That(response.Name, Is.EqualTo("upload"));
             Assert.That(response.FileName, Is.EqualTo(uploadFile.Name));
             Assert.That(response.ContentLength, Is.EqualTo(uploadFile.Length));
             Assert.That(response.Contents, Is.EqualTo(expectedContents));
             Assert.That(response.CustomerName, Is.EqualTo("Foo,Bar"));
             Assert.That(response.CustomerId, Is.EqualTo(123));
+        }
+
+        [Test]
+        public void Can_POST_upload_multiple_files_using_ServiceClient_with_request_and_QueryString()
+        {
+            IServiceClient client = new JsonServiceClient(ListeningOn);
+            var uploadFile = new FileInfo("~/TestExistingDir/upload.html".MapProjectPath());
+
+            using (var stream1 = uploadFile.OpenRead())
+            using (var stream2 = uploadFile.OpenRead())
+            {
+                var response = client.PostFilesWithRequest<MultipleFileUploadResponse>(
+                    ListeningOn + "/multi-fileuploads?CustomerId=123",
+                    new MultipleFileUpload { CustomerName = "Foo,Bar" },
+                    new[] {
+                        new UploadFile("upload1.html", stream1),
+                        new UploadFile("upload2.html", stream2),
+                    });
+
+                var expectedContents = new StreamReader(uploadFile.OpenRead()).ReadToEnd();
+
+                Assert.That(response.Results.Count, Is.EqualTo(2));
+
+                var file1 = response.Results[0];
+                Assert.That(file1.Name, Is.EqualTo("upload0"));
+                Assert.That(file1.FileName, Is.EqualTo("upload1.html"));
+                Assert.That(file1.ContentLength, Is.EqualTo(uploadFile.Length));
+                Assert.That(file1.Contents, Is.EqualTo(expectedContents));
+                Assert.That(file1.CustomerName, Is.EqualTo("Foo,Bar"));
+                Assert.That(file1.CustomerId, Is.EqualTo(123));
+
+                var file2 = response.Results[1];
+                Assert.That(file2.Name, Is.EqualTo("upload1"));
+                Assert.That(file2.FileName, Is.EqualTo("upload2.html"));
+                Assert.That(file2.ContentLength, Is.EqualTo(uploadFile.Length));
+                Assert.That(file2.Contents, Is.EqualTo(expectedContents));
+                Assert.That(file2.CustomerName, Is.EqualTo("Foo,Bar"));
+                Assert.That(file2.CustomerId, Is.EqualTo(123));
+            }
+        }
+
+        [Test]
+        public async Task Can_POST_upload_multiple_files_using_ServiceClient_with_request_and_QueryString_JsonHttpClient()
+        {
+            var client = new JsonHttpClient(ListeningOn);
+            var uploadFile = new FileInfo("~/TestExistingDir/upload.html".MapProjectPath());
+
+            using (var stream1 = uploadFile.OpenRead())
+            using (var stream2 = uploadFile.OpenRead())
+            {
+                var response = await client.PostFilesWithRequestAsync<MultipleFileUploadResponse>(
+                    new MultipleFileUpload { CustomerId = 123, CustomerName = "Foo,Bar" },
+                    new[] {
+                        new UploadFile("upload1.html", stream1),
+                        new UploadFile("upload2.html", stream2),
+                    });
+
+                var expectedContents = new StreamReader(uploadFile.OpenRead()).ReadToEnd();
+
+                Assert.That(response.Results.Count, Is.EqualTo(2));
+
+                var file1 = response.Results[0];
+                Assert.That(file1.Name, Is.EqualTo("upload0"));
+                Assert.That(file1.FileName, Is.EqualTo("upload1.html"));
+                Assert.That(file1.ContentLength, Is.EqualTo(uploadFile.Length));
+                Assert.That(file1.Contents, Is.EqualTo(expectedContents));
+                Assert.That(file1.CustomerName, Is.EqualTo("Foo,Bar"));
+                Assert.That(file1.CustomerId, Is.EqualTo(123));
+
+                var file2 = response.Results[1];
+                Assert.That(file2.Name, Is.EqualTo("upload1"));
+                Assert.That(file2.FileName, Is.EqualTo("upload2.html"));
+                Assert.That(file2.ContentLength, Is.EqualTo(uploadFile.Length));
+                Assert.That(file2.Contents, Is.EqualTo(expectedContents));
+                Assert.That(file2.CustomerName, Is.EqualTo("Foo,Bar"));
+                Assert.That(file2.CustomerId, Is.EqualTo(123));
+            }
         }
 
         [Test]
@@ -173,6 +255,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var response = client.PostFileWithRequest<FileUploadResponse>(ListeningOn + "/fileuploads", uploadFile, request);
 
             var expectedContents = new StreamReader(uploadFile.OpenRead()).ReadToEnd();
+            Assert.That(response.Name, Is.EqualTo("upload"));
             Assert.That(response.FileName, Is.EqualTo(uploadFile.Name));
             Assert.That(response.ContentLength, Is.EqualTo(uploadFile.Length));
             Assert.That(response.Contents, Is.EqualTo(expectedContents));
@@ -235,6 +318,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
                 var expectedContents = new StreamReader(uploadFile.OpenRead()).ReadToEnd();
                 Assert.That(isFilterCalled);
+                Assert.That(response.Name, Is.EqualTo("file"));
                 Assert.That(response.FileName, Is.EqualTo(uploadFile.Name));
                 Assert.That(response.ContentLength, Is.EqualTo(uploadFile.Length));
                 Assert.That(response.ContentType, Is.EqualTo(MimeTypes.GetMimeType(uploadFile.Name)));
@@ -269,6 +353,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                     var expectedContents = new StreamReader(fileStream).ReadToEnd();
 
                     Assert.That(isFilterCalled);
+                    Assert.That(response.Name, Is.EqualTo("file"));
                     Assert.That(response.FileName, Is.EqualTo(fileName));
                     Assert.That(response.ContentLength, Is.EqualTo(fileStream.Length));
                     Assert.That(response.ContentType, Is.EqualTo(MimeTypes.GetMimeType(fileName)));
@@ -304,6 +389,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                     var expectedContents = new StreamReader(fileStream).ReadToEnd();
 
                     Assert.That(isFilterCalled);
+                    Assert.That(response.Name, Is.EqualTo("file"));
                     Assert.That(response.FileName, Is.EqualTo(fileName));
                     Assert.That(response.ContentLength, Is.EqualTo(fileStream.Length));
                     Assert.That(response.ContentType, Is.EqualTo(MimeTypes.GetMimeType(fileName)));

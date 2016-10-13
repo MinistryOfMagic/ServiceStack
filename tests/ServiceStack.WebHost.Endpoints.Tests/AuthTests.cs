@@ -175,8 +175,26 @@ namespace ServiceStack.WebHost.Endpoints.Tests
     {
         public override void OnAuthenticated(IServiceBase authService, IAuthSession session, IAuthTokens tokens, System.Collections.Generic.Dictionary<string, string> authInfo)
         {
-            if (session.UserName == AuthTests.UserNameWithSessionRedirect)
+            if (session.UserAuthName == AuthTests.UserNameWithSessionRedirect)
                 session.ReferrerUrl = AuthTests.SessionRedirectUrl;
+        }
+
+        public int Counter { get; set; }
+    }
+
+    public class IncrSession : IReturn<CustomUserSession>
+    {
+        public int? By { get; set; }
+    }
+
+    public class CustomUserSessionService : Service
+    {
+        public object Any(IncrSession request)
+        {
+            var session = SessionAs<CustomUserSession>();
+            session.Counter += request.By.GetValueOrDefault(1);
+            Request.SaveSession(session);
+            return session;
         }
     }
 
@@ -298,7 +316,9 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
             Plugins.Add(new AuthFeature(() => new CustomUserSession(),
                 GetAuthProviders(), "~/" + AuthTests.LoginUrl)
-            { RegisterPlugins = { new WebSudoFeature() } });
+            {
+                RegisterPlugins = { new WebSudoFeature() }
+            });
 
             container.Register(new MemoryCacheClient());
             userRep = new InMemoryAuthRepository();
@@ -541,16 +561,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
                 var client = (ServiceClientBase)GetClientWithUserPassword();
                 client.AlwaysSendBasicAuthHeader = true;
-                client.RequestFilter = req =>
-                {
-                    bool hasAuthentication = false;
-                    foreach (var key in req.Headers.Keys)
-                    {
-                        if (key.ToString() == "Authorization")
-                            hasAuthentication = true;
-                    }
-                    Assert.IsTrue(hasAuthentication);
-                };
+                client.RequestFilter = req => 
+                    Assert.That(req.Headers[HttpHeaders.Authorization], Is.Not.Null);
 
                 var request = new Secured { Name = "test" };
                 var response = client.Send<SecureResponse>(request);
@@ -559,6 +571,31 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             catch (WebServiceException webEx)
             {
                 Assert.Fail(webEx.Message);
+            }
+        }
+
+        [Test]
+        public void Authenticating_once_with_BasicAuth_does_not_establish_auth_session()
+        {
+            var client = (ServiceClientBase)GetClientWithUserPassword();
+            client.AlwaysSendBasicAuthHeader = true;
+            client.RequestFilter = req =>
+                Assert.That(req.Headers[HttpHeaders.Authorization], Is.Not.Null);
+
+            var request = new Secured { Name = "test" };
+            var response = client.Send<SecureResponse>(request);
+            Assert.That(response.Result, Is.EqualTo(request.Name));
+
+            var nonBasicAuthClient = GetClient();
+            nonBasicAuthClient.SetSessionId(client.GetSessionId());
+            try
+            {
+                response = nonBasicAuthClient.Send<SecureResponse>(request);
+                Assert.Fail("Should throw");
+            }
+            catch (WebServiceException webEx)
+            {
+                Assert.That(webEx.StatusCode, Is.EqualTo((int)HttpStatusCode.Unauthorized));
             }
         }
 
@@ -622,7 +659,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             var client = GetClient();
 
             var request = new Secured { Name = "test" };
-            var authResponse = await client.SendAsync<AuthenticateResponse>(
+            var authResponse = await client.SendAsync(
                 new Authenticate
                 {
                     provider = CredentialsAuthProvider.Name,
@@ -809,7 +846,7 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
                 Console.WriteLine(authResponse.Dump());
 
-                for (int i = 0; i < 500; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     var request = new Secured { Name = "test" };
                     var response = client.Send<SecureResponse>(request);
@@ -847,6 +884,31 @@ namespace ServiceStack.WebHost.Endpoints.Tests
 
                 lastPermId = permId;
             });
+        }
+
+        [Test]
+        public void Does_retain_Session_after_authenticating_multiple_times()
+        {
+            var client = GetClient();
+            CustomUserSession lastSession = null;
+            3.Times(x =>
+            {
+                var authResponse = client.Send(new Authenticate
+                {
+                    provider = CredentialsAuthProvider.Name,
+                    UserName = "user",
+                    Password = "p@55word",
+                    RememberMe = true,
+                });
+
+                var customSession = client.Send(new IncrSession { By = 1 });
+                Assert.That(customSession.Counter,
+                    lastSession == null ? Is.EqualTo(1) : Is.EqualTo(lastSession.Counter + 1));
+
+                lastSession = customSession;
+            });
+
+            Assert.That(lastSession.Counter, Is.EqualTo(3));
         }
 
         [Test]
@@ -1308,10 +1370,10 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 Assert.That(webEx.StatusCode, Is.EqualTo((int)HttpStatusCode.Unauthorized));
                 Console.WriteLine(webEx.ResponseDto.Dump());
             }
-            
+
             // Should still be authenticated, but not elevated
-            try 
-            { 
+            try
+            {
                 client.Send<RequiresWebSudoResponse>(request);
                 Assert.Fail("Shouldn't be allowed");
             }

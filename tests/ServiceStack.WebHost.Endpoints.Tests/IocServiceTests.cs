@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Funq;
 using NUnit.Framework;
+using ServiceStack.Common.Tests;
 using ServiceStack.Configuration;
 using ServiceStack.Shared.Tests;
 using ServiceStack.Text;
@@ -28,6 +29,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
         public override void OnEndRequest(IRequest request = null)
         {
             base.OnEndRequest(request);
+        }
+
+        public override object OnPreExecuteServiceFilter(IService service, object request, IRequest httpReq, IResponse httpRes)
+        {
+            if (service is IocScopeService)
+                service.InjectRequestIntoDependencies(httpReq);
+            return request;
         }
     }
 
@@ -87,13 +95,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
                 var response = client.Get<IocResponse>("ioc");
                 var expected = new List<string> {
-					typeof(FunqDepCtor).Name,
-					typeof(AltDepCtor).Name,
-					typeof(FunqDepProperty).Name,
-					typeof(FunqDepDisposableProperty).Name,
-					typeof(AltDepProperty).Name,
-					typeof(AltDepDisposableProperty).Name,
-				};
+                    typeof(FunqDepCtor).Name,
+                    typeof(AltDepCtor).Name,
+                    typeof(FunqDepProperty).Name,
+                    typeof(FunqDepDisposableProperty).Name,
+                    typeof(AltDepProperty).Name,
+                    typeof(AltDepDisposableProperty).Name,
+                };
 
                 //Console.WriteLine(response.Results.Dump());
                 Assert.That(expected.EquivalentTo(response.Results));
@@ -112,13 +120,13 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             {
                 var response = client.Get<IocResponse>("iocasync");
                 var expected = new List<string> {
-					typeof(FunqDepCtor).Name,
-					typeof(AltDepCtor).Name,
-					typeof(FunqDepProperty).Name,
-					typeof(FunqDepDisposableProperty).Name,
-					typeof(AltDepProperty).Name,
-					typeof(AltDepDisposableProperty).Name,
-				};
+                    typeof(FunqDepCtor).Name,
+                    typeof(AltDepCtor).Name,
+                    typeof(FunqDepProperty).Name,
+                    typeof(FunqDepDisposableProperty).Name,
+                    typeof(AltDepProperty).Name,
+                    typeof(AltDepDisposableProperty).Name,
+                };
 
                 //Console.WriteLine(response.Results.Dump());
                 Assert.That(expected.EquivalentTo(response.Results));
@@ -179,6 +187,8 @@ namespace ServiceStack.WebHost.Endpoints.Tests
             Assert.That(response2.Results[typeof(FunqSingletonScope).Name], Is.EqualTo(1));
             Assert.That(response2.Results[typeof(FunqRequestScope).Name], Is.EqualTo(2));
             Assert.That(response2.Results[typeof(FunqNoneScope).Name], Is.EqualTo(4));
+
+            Assert.That(response2.InjectsRequest, Is.EqualTo(2));
 
             Thread.Sleep(WaitForRequestCleanup);
 
@@ -258,11 +268,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 var response = client.Get(new ActionAttr());
 
                 var expected = new List<string> {
-					typeof(FunqDepProperty).Name,
-					typeof(FunqDepDisposableProperty).Name,
-					typeof(AltDepProperty).Name,
-					typeof(AltDepDisposableProperty).Name,
-				};
+                    typeof(FunqDepProperty).Name,
+                    typeof(FunqDepDisposableProperty).Name,
+                    typeof(AltDepProperty).Name,
+                    typeof(AltDepDisposableProperty).Name,
+                };
 
                 Assert.That(expected.EquivalentTo(response.Results));
 
@@ -283,11 +293,11 @@ namespace ServiceStack.WebHost.Endpoints.Tests
                 var response = client.Get(new ActionAttrAsync());
 
                 var expected = new List<string> {
-					typeof(FunqDepProperty).Name,
-					typeof(FunqDepDisposableProperty).Name,
-					typeof(AltDepProperty).Name,
-					typeof(AltDepDisposableProperty).Name,
-				};
+                    typeof(FunqDepProperty).Name,
+                    typeof(FunqDepDisposableProperty).Name,
+                    typeof(AltDepProperty).Name,
+                    typeof(AltDepDisposableProperty).Name,
+                };
 
                 Assert.That(expected.EquivalentTo(response.Results));
 

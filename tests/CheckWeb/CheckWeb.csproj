@@ -19,6 +19,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,11 +40,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="ServiceStack.Admin">
+      <HintPath>..\..\lib\tests\ServiceStack.Admin.dll</HintPath>
+    </Reference>
     <Reference Include="ServiceStack.Interfaces">
       <HintPath>..\..\lib\ServiceStack.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack.OrmLite">
       <HintPath>..\..\lib\ServiceStack.OrmLite.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite.PostgreSQL">
+      <HintPath>..\..\lib\ServiceStack.OrmLite.PostgreSQL.dll</HintPath>
     </Reference>
     <Reference Include="ServiceStack.OrmLite.Sqlite">
       <HintPath>..\..\lib\ServiceStack.OrmLite.Sqlite.dll</HintPath>
@@ -122,6 +129,11 @@
     <Content Include="TestMinifier.cshtml" />
     <Content Include="TestMinifier.html" />
     <Content Include="default.html" />
+    <Content Include="TestError.cshtml" />
+    <Content Include="GlobalErrorHandler.cshtml" />
+    <Content Include="Views\TestErrorView.cshtml" />
+    <Content Include="folder\_new.cshtml" />
+    <Content Include="folder\new.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

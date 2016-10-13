@@ -12,7 +12,7 @@ namespace ServiceStack.NativeTypes.Java
     public class JavaGenerator
     {
         readonly MetadataTypesConfig Config;
-        readonly List<MetadataType> AllTypes;
+        List<MetadataType> AllTypes;
         List<string> conflictTypeNames = new List<string>();
 
         public JavaGenerator(MetadataTypesConfig config)
@@ -21,7 +21,7 @@ namespace ServiceStack.NativeTypes.Java
             AllTypes = new List<MetadataType>();
         }
 
-        public static string DefaultGlobalNamespace = "dto";
+        public static string DefaultGlobalNamespace = "dtos";
 
         public static List<string> DefaultImports = new List<string>
         {
@@ -78,6 +78,10 @@ namespace ServiceStack.NativeTypes.Java
             {"Dictionary", "HashMap"},
         }.ToConcurrentDictionary();
 
+        public static Func<List<MetadataType>, List<MetadataType>> FilterTypes = DefaultFilterTypes;
+
+        public static List<MetadataType> DefaultFilterTypes(List<MetadataType> types) => types;
+
         public string GetCode(MetadataTypes metadata, IRequest request, INativeTypesMetadata nativeTypes)
         {
             var typeNamespaces = new HashSet<string>();
@@ -103,10 +107,12 @@ namespace ServiceStack.NativeTypes.Java
             Func<string, string> defaultValue = k =>
                 request.QueryString[k].IsNullOrEmpty() ? "//" : "";
 
-            var sb = new StringBuilderWrapper(new StringBuilder());
+            var sbInner = StringBuilderCache.Allocate();
+            var sb = new StringBuilderWrapper(sbInner);
             sb.AppendLine("/* Options:");
             sb.AppendLine("Date: {0}".Fmt(DateTime.Now.ToString("s").Replace("T", " ")));
             sb.AppendLine("Version: {0}".Fmt(Env.ServiceStackVersion));
+            sb.AppendLine("Tip: {0}".Fmt(HelpMessages.NativeTypesDtoOptionsTip.Fmt("//")));
             sb.AppendLine("BaseUrl: {0}".Fmt(Config.BaseUrl));
             sb.AppendLine();
             sb.AppendLine("{0}Package: {1}".Fmt(defaultValue("Package"), Config.Package));
@@ -115,6 +121,7 @@ namespace ServiceStack.NativeTypes.Java
             sb.AppendLine("{0}SettersReturnThis: {1}".Fmt(defaultValue("SettersReturnThis"), Config.SettersReturnThis));
             sb.AppendLine("{0}AddServiceStackTypes: {1}".Fmt(defaultValue("AddServiceStackTypes"), Config.AddServiceStackTypes));
             sb.AppendLine("{0}AddResponseStatus: {1}".Fmt(defaultValue("AddResponseStatus"), Config.AddResponseStatus));
+            sb.AppendLine("{0}AddDescriptionAsComments: {1}".Fmt(defaultValue("AddDescriptionAsComments"), Config.AddDescriptionAsComments));
             sb.AppendLine("{0}AddImplicitVersion: {1}".Fmt(defaultValue("AddImplicitVersion"), Config.AddImplicitVersion));
             sb.AppendLine("{0}IncludeTypes: {1}".Fmt(defaultValue("IncludeTypes"), Config.IncludeTypes.Safe().ToArray().Join(",")));
             sb.AppendLine("{0}ExcludeTypes: {1}".Fmt(defaultValue("ExcludeTypes"), Config.ExcludeTypes.Safe().ToArray().Join(",")));
@@ -150,9 +157,11 @@ namespace ServiceStack.NativeTypes.Java
             AllTypes.AddRange(responseTypes);
             AllTypes.AddRange(types);
 
+            AllTypes = FilterTypes(AllTypes);
+
             //TypeScript doesn't support reusing same type name with different generic airity
             var conflictPartialNames = AllTypes.Map(x => x.Name).Distinct()
-                .GroupBy(g => g.SplitOnFirst('`')[0])
+                .GroupBy(g => g.LeftPart('`'))
                 .Where(g => g.Count() > 1)
                 .Select(g => g.Key)
                 .ToList();
@@ -232,7 +241,7 @@ namespace ServiceStack.NativeTypes.Java
             sb.AppendLine();
             sb.AppendLine("}");
 
-            return sb.ToString();
+            return StringBuilderCache.ReturnAndFree(sbInner);
         }
 
         private bool ReferencesGson(MetadataTypes metadata)
@@ -343,8 +352,8 @@ namespace ServiceStack.NativeTypes.Java
 
                         if (implStr.StartsWith("IReturn<"))
                         {
-                            var parts = implStr.SplitOnFirst('<');
-                            var returnType = parts[1].Substring(0, parts[1].Length - 1);
+                            var types = implStr.RightPart('<');
+                            var returnType = types.Substring(0, types.Length - 1);
 
                             //Can't get .class from Generic Type definition
                             responseTypeExpression = returnType.Contains("<")
@@ -413,7 +422,8 @@ namespace ServiceStack.NativeTypes.Java
         {
             var wasAdded = false;
 
-            var sbAccessors = new StringBuilderWrapper(new StringBuilder());
+            var sbInner = StringBuilderCacheAlt.Allocate();
+            var sbAccessors = new StringBuilderWrapper(sbInner);
             if (addPropertyAccessors)
             {
                 sbAccessors.AppendLine();
@@ -432,7 +442,8 @@ namespace ServiceStack.NativeTypes.Java
                     var fieldName = prop.Name.SafeToken().PropertyStyle();
                     var accessorName = fieldName.ToPascalCase();
 
-                    wasAdded = AppendDataMember(sb, prop.DataMember, dataMemberIndex++);
+                    wasAdded = AppendComments(sb, prop.Description);
+                    wasAdded = AppendDataMember(sb, prop.DataMember, dataMemberIndex++) || wasAdded;
                     wasAdded = AppendAttributes(sb, prop.Attributes) || wasAdded;
 
                     if (!fieldName.IsKeyWord())
@@ -463,7 +474,7 @@ namespace ServiceStack.NativeTypes.Java
             }
 
             if (sbAccessors.Length > 0)
-                sb.AppendLine(sbAccessors.ToString().TrimEnd()); //remove last \n
+                sb.AppendLine(StringBuilderCacheAlt.ReturnAndFree(sbInner).TrimEnd()); //remove last \n
         }
         
         public bool AppendAttributes(StringBuilderWrapper sb, List<MetadataAttribute> attributes)
@@ -487,7 +498,7 @@ namespace ServiceStack.NativeTypes.Java
                 }
                 else
                 {
-                    var args = new StringBuilder();
+                    var args = StringBuilderCacheAlt.Allocate();
                     if (attr.ConstructorArgs != null)
                     {
                         if (attr.ConstructorArgs.Count > 1)
@@ -509,7 +520,7 @@ namespace ServiceStack.NativeTypes.Java
                             args.Append("{0}={1}".Fmt(attrArg.Name, TypeValue(attrArg.Type, attrArg.Value)));
                         }
                     }
-                    sb.AppendLine(prefix + "@{0}({1})".Fmt(attr.Name, args));
+                    sb.AppendLine(prefix + "@{0}({1})".Fmt(attr.Name, StringBuilderCacheAlt.ReturnAndFree(args)));
                 }
             }
 
@@ -527,7 +538,7 @@ namespace ServiceStack.NativeTypes.Java
             if (value.StartsWith("typeof("))
             {
                 //Only emit type as Namespaces are merged
-                var typeNameOnly = value.Substring(7, value.Length - 8).SplitOnLast('.').Last();
+                var typeNameOnly = value.Substring(7, value.Length - 8).LastRightPart('.');
                 return typeNameOnly + ".class";
             }
 
@@ -577,7 +588,7 @@ namespace ServiceStack.NativeTypes.Java
                 var parts = type.Split('`');
                 if (parts.Length > 1)
                 {
-                    var args = new StringBuilder();
+                    var args = StringBuilderCacheAlt.Allocate();
                     foreach (var arg in genericArgs)
                     {
                         if (args.Length > 0)
@@ -587,7 +598,7 @@ namespace ServiceStack.NativeTypes.Java
                     }
 
                     var typeName = TypeAlias(type);
-                    return "{0}<{1}>".Fmt(typeName, args);
+                    return "{0}<{1}>".Fmt(typeName, StringBuilderCacheAlt.ReturnAndFree(args));
                 }
             }
 
@@ -613,16 +624,18 @@ namespace ServiceStack.NativeTypes.Java
                 ? type.Replace('`','_')
                 : type.SplitOnFirst('`')[0];
 
-            return name.SplitOnLast('.').Last().SafeToken();
+            return name.LastRightPart('.').SafeToken();
         }
 
-        public void AppendComments(StringBuilderWrapper sb, string desc)
+        public bool AppendComments(StringBuilderWrapper sb, string desc)
         {
-            if (desc == null) return;
-
-            sb.AppendLine("/**");
-            sb.AppendLine("* {0}".Fmt(desc.SafeComment()));
-            sb.AppendLine("*/");
+            if (desc != null && Config.AddDescriptionAsComments)
+            {
+                sb.AppendLine("/**");
+                sb.AppendLine("* {0}".Fmt(desc.SafeComment()));
+                sb.AppendLine("*/");
+            }
+            return false;
         }
 
         public void AppendDataContract(StringBuilderWrapper sb, MetadataDataContract dcMeta)
@@ -756,7 +769,7 @@ namespace ServiceStack.NativeTypes.Java
             }
 
             var typeName = sb.ToString();
-            return typeName.SplitOnLast('.').Last(); //remove nested class
+            return typeName.LastRightPart('.'); //remove nested class
         }
     }
 

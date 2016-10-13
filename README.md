@@ -1,30 +1,45 @@
-See [servicestack.net/features](http://servicestack.net/features) for an overview and the [Release Notes](https://servicestack.net/release-notes) for latest features.
+Join the [ServiceStack Google+ Community](https://plus.google.com/communities/112445368900682590445) or follow [@ServiceStack](https://twitter.com/servicestack) for updates. 
 
-Join the [ServiceStack Google+ Community](https://plus.google.com/u/0/communities/112445368900682590445) or
-follow [@ServiceStack](http://twitter.com/servicestack) for project updates. 
+> View the [Release Notes](https://servicestack.net/release-notes) for latest features or see [servicestack.net/features](https://servicestack.net/features) for an overview.
 
 ### Simple, Fast, Versatile and full-featured Services Framework
 
 ServiceStack is a simple, fast, versatile and highly-productive full-featured [Web](http://razor.servicestack.net) and 
 [Web Services](https://github.com/ServiceStack/ServiceStack/wiki/Service-Stack-Web-Services) Framework that's 
-thoughtfully-architected to [reduce artificial complexity](https://github.com/ServiceStack/ServiceStack/wiki/Auto-Query#why-not-complexity) and promote 
+thoughtfully-architected to [reduce artificial complexity](https://github.com/ServiceStack/ServiceStack/wiki/Why-not-OData#why-not-complexity) and promote 
 [remote services best-practices](https://github.com/ServiceStack/ServiceStack/wiki/Advantages-of-message-based-web-services) 
-with a [message-based design](https://github.com/ServiceStack/ServiceStack/wiki/What-is-a-message-based-web-service%3F) 
-that allows for maximum re-use where ServiceStack Services are able to be consumed via an array of built-in fast data formats (inc. 
+with a [message-based design](https://github.com/ServiceStack/ServiceStack/wiki/What-is-a-message-based-web-service) 
+that allows for maximum re-use that can leverage an integrated 
+[Service Gateway](https://github.com/ServiceStack/ServiceStack/wiki/Service-Gateway) 
+for the creation of loosely-coupled 
+[Modularized Service](https://github.com/ServiceStack/ServiceStack/wiki/Modularizing-services) Architectures.
+ServiceStack Services are consumable via an array of built-in fast data formats (inc. 
 [JSON](https://github.com/ServiceStack/ServiceStack.Text), 
 XML, 
-[CSV](https://github.com/ServiceStack/ServiceStack/wiki/ServiceStack-CSV-Format), 
+[CSV](https://github.com/ServiceStack/ServiceStack/wiki/CSV-Format), 
 [JSV](https://github.com/ServiceStack/ServiceStack.Text/wiki/JSV-Format), 
 [ProtoBuf](https://github.com/ServiceStack/ServiceStack/wiki/Protobuf-format) and 
 [MsgPack](https://github.com/ServiceStack/ServiceStack/wiki/MessagePack-Format)) 
 as well as XSD/WSDL for [SOAP endpoints](https://github.com/ServiceStack/ServiceStack/wiki/SOAP-support) and 
-[Rabbit MQ](https://github.com/ServiceStack/ServiceStack/wiki/Rabbit-MQ) and 
-[Redis MQ](https://github.com/ServiceStack/ServiceStack/wiki/Messaging-and-Redis) hosts. 
+[Rabbit MQ](https://github.com/ServiceStack/ServiceStack/wiki/Rabbit-MQ), 
+[Redis MQ](https://github.com/ServiceStack/ServiceStack/wiki/Messaging-and-Redis) and
+[Amazon SQS](https://github.com/ServiceStack/ServiceStack.Aws#sqsmqserver) MQ hosts. 
+
+Its design and simplicity focus offers an unparalleled suite of productivity features that can be declaratively enabled 
+without code, from creating fully queryable Web API's with just a single Typed Request DTO with
+[Auto Query](https://github.com/ServiceStack/ServiceStack/wiki/Auto-Query) supporting 
+[every major RDBMS](https://github.com/ServiceStack/ServiceStack.OrmLite#8-flavours-of-ormlite-is-on-nuget) 
+to the built-in support for
+[Auto Batched Requests](https://github.com/ServiceStack/ServiceStack/wiki/Auto-Batched-Requests) 
+or effortlessly enabling rich [HTTP Caching](https://github.com/ServiceStack/ServiceStack/wiki/HTTP-Caching) and
+[Encrypted Messaging](https://github.com/ServiceStack/ServiceStack/wiki/Encrypted-Messaging) 
+for all your existing services via [Plugins](https://github.com/ServiceStack/ServiceStack/wiki/Plugins).
 
 Your same Services also serve as the Controller in ServiceStack's [Smart Razor Views](http://razor.servicestack.net/)
 reducing the effort to serve both 
 [Web and Single Page Apps](https://github.com/ServiceStackApps/LiveDemos) as well as 
-[Rich Desktop and Mobile Clients](https://github.com/ServiceStackApps/HelloMobile).
+[Rich Desktop and Mobile Clients](https://github.com/ServiceStackApps/HelloMobile) that are able to deliver instant interactive 
+experiences using ServiceStack's real-time [Server Events](https://github.com/ServiceStack/ServiceStack/wiki/Server-Events).
 
 ServiceStack Services also maximize productivity for consumers providing an 
 [instant end-to-end typed API without code-gen](https://github.com/ServiceStack/ServiceStack/wiki/C%23-client) enabling
@@ -57,7 +72,7 @@ Providing [C# Native Types](https://github.com/ServiceStack/ServiceStack/wiki/CS
 support for developing iOS and Android mobile Apps using 
 [Xamarin.iOS](https://github.com/ServiceStackApps/HelloMobile#xamarinios-client) and 
 [Xamarin.Android](https://github.com/ServiceStackApps/HelloMobile#xamarinandroid-client) with 
-[Xamarin Studio](http://xamarin.com/studio) on OSX. The **ServiceStackXS** plugin also provides a rich web service 
+[Xamarin Studio](https://www.xamarin.com/studio) on OSX. The **ServiceStackXS** plugin also provides a rich web service 
 development experience developing Client applications with 
 [Mono Develop on Linux](https://github.com/ServiceStack/ServiceStack/wiki/CSharp-Add-ServiceStack-Reference#xamarin-studio-for-linux)
 
@@ -70,11 +85,12 @@ native iOS and OSX Applications - directly from within Xcode!
 #### [Android Studio integration with ServiceStackIDEA](https://github.com/ServiceStack/ServiceStack/wiki/Java-Add-ServiceStack-Reference)
 
 Providing [an instant Native Typed API in Java](https://github.com/ServiceStack/ServiceStack/wiki/Java-Add-ServiceStack-Reference) 
-including idiomatic Java Generic Service Clients supporting Sync and Async Requests by levaraging Android's AsyncTasks to enable the creation of services-rich and responsive native Java Mobile Apps on the Android platform - directly from within Android Studio!
+and [Kotlin](https://github.com/ServiceStack/ServiceStack/wiki/Kotlin-Add-ServiceStack-Reference)
+including idiomatic Java Generic Service Clients supporting Sync and Async Requests by levaraging Android's AsyncTasks to enable the creation of services-rich and responsive native Java or Kotlin Mobile Apps on the Android platform - directly from within Android Studio!
 
 #### [IntelliJ integration with ServiceStackIDEA](https://github.com/ServiceStack/ServiceStack/wiki/Java-Add-ServiceStack-Reference#install-servicestack-idea-from-the-plugin-repository)
 
-The ServiceStack IDEA plugin is installable directly from IntelliJ's Plugin repository and enables seamless integration with IntelliJ Java Maven projects for genearting a Typed API to quickly and effortlessly consume remote ServiceStack Web Services from pure cross-platform Java Clients.
+The ServiceStack IDEA plugin is installable directly from IntelliJ's Plugin repository and enables seamless integration with IntelliJ Java Maven projects for genearting a Typed API to quickly and effortlessly consume remote ServiceStack Web Services from pure cross-platform Java or Kotlin Clients.
 
 #### [Eclipse integration with ServiceStackEclipse](https://github.com/ServiceStack/ServiceStack.Java/tree/master/src/ServiceStackEclipse#eclipse-integration-with-servicestack)
 
@@ -235,23 +251,47 @@ Same code also works with [PCL Clients in Xamarin iOS/Android, Windows Store App
 [VB.NET](https://github.com/ServiceStack/ServiceStack/wiki/VB.Net-Add-ServiceStack-Reference) can re-use same 
 [.NET Service Clients](https://github.com/ServiceStack/ServiceStack/wiki/C%23-client) and DTO's
 
+### [Calling from TypeScript](https://github.com/ServiceStack/ServiceStack/wiki/TypeScript-Add-ServiceStack-Reference#ideal-typed-message-based-api)
+
+```ts
+const client = new JsonServiceClient(baseUrl);
+
+client.get(new GetCustomers())
+    .then(r => {
+        const results = r.results;
+    });
+```
+
+### [Calling from Swift](https://github.com/ServiceStack/ServiceStack/wiki/Swift-Add-ServiceStack-Reference#jsonserviceclientswift)
+
+```swift
+let client = JsonServiceClient(baseUrl: BaseUri)
+
+client.getAsync(GetCustomers())
+    .then {
+        let results = $0.results;
+    }
+```
+
 ### [Calling from Java](https://github.com/ServiceStack/ServiceStack/wiki/Java-Add-ServiceStack-Reference#jsonserviceclient-usage)
 
 ```java
 JsonServiceClient client = new JsonServiceClient(BaseUri);
 
-GetCustomersResponse all = client.get(new GetCustomers());
+GetCustomersResponse response = client.get(new GetCustomers());
+List<Customer> results = response.results; 
 ```
 
-### [Calling from Swift](https://github.com/ServiceStack/ServiceStack/wiki/Swift-Add-ServiceStack-Reference#jsonserviceclientswift)
+### [Calling from Kotlin](https://github.com/ServiceStack/ServiceStack/wiki/Kotlin-Add-ServiceStack-Reference#jsonserviceclient-usage)
 
-```java
-var client = JsonServiceClient(baseUrl: BaseUri)
+```kotlin
+val client = JsonServiceClient(BaseUri)
 
-let response = client.get(GetCustomers())
+val response = client.get(GetCustomers())
+val results = response.results
 ```
 
-### [Calling from jQuery using TypeScript](https://github.com/ServiceStack/ServiceStack/wiki/TypeScript-Add-ServiceStack-Reference)
+### [Calling from jQuery using TypeScript Defintions](https://github.com/ServiceStack/ServiceStack/wiki/TypeScript-Add-ServiceStack-Reference#typescript-interface-definitions)
 
 ```js
 $.getJSON($.ss.createUrl("/customers", request), request, 
@@ -288,7 +328,7 @@ That's all the application code required to create and consume a simple database
 
 ## Download
 
-If you have [NuGet](http://nuget.org) installed, the easiest way to get started is to: 
+If you have [NuGet](http://www.nuget.org/) installed, the easiest way to get started is to: 
 
 ### [Install ServiceStack via NuGet](https://servicestack.net/download).
 
@@ -317,26 +357,19 @@ Each library is released under its respective licence:
   - [Mono](https://github.com/mono/mono) [(License)](https://github.com/mono/mono/blob/master/LICENSE)
   - [Funq IOC](http://funq.codeplex.com) [(License)](http://funq.codeplex.com/license)
   - [Fluent Validation](http://fluentvalidation.codeplex.com) [(License)](http://fluentvalidation.codeplex.com/license)
-  - [Mini Profiler](http://code.google.com/p/mvc-mini-profiler/) [(License)](http://www.apache.org/licenses/LICENSE-2.0)
-  - [Dapper](http://code.google.com/p/dapper-dot-net/) [(License)](http://www.apache.org/licenses/LICENSE-2.0)
+  - [Mini Profiler](https://code.google.com/archive/p/mvc-mini-profiler) [(License)](http://www.apache.org/licenses/LICENSE-2.0)
+  - [Dapper](https://code.google.com/archive/p/dapper-dot-net) [(License)](http://www.apache.org/licenses/LICENSE-2.0)
   - [TweetStation's OAuth library](https://github.com/migueldeicaza/TweetStation) [(License)](https://github.com/migueldeicaza/TweetStation/blob/master/LICENSE)
-  - [MarkdownSharp](http://code.google.com/p/markdownsharp/) [(License)](http://opensource.org/licenses/mit-license.php)
+  - [MarkdownSharp](https://code.google.com/archive/p/markdownsharp) [(License)](https://opensource.org/licenses/mit-license.php)
   - [MarkdownDeep](https://github.com/toptensoftware/markdowndeep) [(License)](http://www.toptensoftware.com/markdowndeep/license)
-  - [HtmlCompressor](https://code.google.com/p/htmlcompressor/) [(License)](http://www.apache.org/licenses/LICENSE-2.0)
+  - [HtmlCompressor](https://code.google.com/archive/p/htmlcompressor) [(License)](http://www.apache.org/licenses/LICENSE-2.0)
   - [JSMin](https://github.com/douglascrockford/JSMin/blob/master/jsmin.c) [(License)](http://www.apache.org/licenses/LICENSE-2.0)
   - [RecyclableMemoryStream](https://github.com/Microsoft/Microsoft.IO.RecyclableMemoryStream) [(License)](https://github.com/Microsoft/Microsoft.IO.RecyclableMemoryStream/blob/master/LICENSE)
-
-## Similar open source projects
-
-Similar Open source .NET projects for developing or accessing web services include:
-
- * [Nancy Fx](http://nancyfx.org) - A Sinatra-inspired lightweight Web Framework for .NET:
- * [Fubu MVC](http://mvc.fubu-project.org) - A "Front Controller" pattern-style MVC framework designed for use in web applications built on ASP.NET:
- * [Rest Sharp](http://restsharp.org) - An open source REST client for .NET
+  - [ASP.NET MVC](https://github.com/aspnet/Mvc) [(License)](https://github.com/aspnet/Mvc/blob/dev/LICENSE.txt)
 
 ## Find out More
 
-Follow [@ServiceStack](http://twitter.com/ServiceStack) and 
+Follow [@ServiceStack](https://twitter.com/ServiceStack) and 
 [+ServiceStack](https://plus.google.com/u/0/communities/112445368900682590445) for project updates.
 
 -----
@@ -345,6 +378,7 @@ Follow [@ServiceStack](http://twitter.com/ServiceStack) and
 
  - [mythz](https://github.com/mythz) (Demis Bellot)
  - [layoric](https://github.com/layoric) (Darren Reid) / [@layoric](https://twitter.com/layoric)
+ - [xplicit](https://github.com/xplicit) (Sergey Zhukov) / [@quantumcalc](https://twitter.com/quantumcalc)
  - [arxisos](https://github.com/arxisos) (Steffen Müller) / [@arxisos](https://twitter.com/arxisos)
  - [desunit](https://github.com/desunit) (Sergey Bogdanov) / [@desunit](https://twitter.com/desunit)
 
@@ -654,4 +688,10 @@ A big thanks to GitHub and all of ServiceStack's contributors:
 
 ***
 
-Runs on both Mono and .NET _(Live preview hosted on Mono / Ubuntu)_
+## Similar open source projects
+
+Similar Open source .NET projects for developing or accessing web services include:
+
+ * [Nancy Fx](http://nancyfx.org) - A Sinatra-inspired lightweight Web Framework for .NET:
+ * [Fubu MVC](http://mvc.fubu-project.org) - A "Front Controller" pattern-style MVC framework designed for use in web applications built on ASP.NET:
+ * [Rest Sharp](http://restsharp.org) - An open source REST client for .NET

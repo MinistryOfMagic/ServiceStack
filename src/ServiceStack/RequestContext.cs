@@ -2,8 +2,13 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
 using ServiceStack.Logging;
+
+#if !NETSTANDARD1_6
+using System.Runtime.Remoting.Messaging;
+#else
+using System.Threading;
+#endif
 
 namespace ServiceStack
 {
@@ -20,6 +25,10 @@ namespace ServiceStack
         [ThreadStatic]
         public static IDictionary RequestItems;
 
+#if NETSTANDARD1_6
+        public static AsyncLocal<IDictionary> AsyncRequestItems = new AsyncLocal<IDictionary>();
+#endif
+
         /// <summary>
         /// Gets a list of items for this request. 
         /// </summary>
@@ -30,9 +39,7 @@ namespace ServiceStack
         {
             get
             {
-                return GetItems() ?? (System.Web.HttpContext.Current != null
-                    ? System.Web.HttpContext.Current.Items
-                    : CreateItems());
+                return GetItems() ?? CreateItems();
             }
             set
             {
@@ -44,6 +51,7 @@ namespace ServiceStack
 
         private IDictionary GetItems()
         {
+#if !NETSTANDARD1_6
             try
             {
                 if (UseThreadStatic)
@@ -53,6 +61,9 @@ namespace ServiceStack
                 if (!ServiceStackHost.IsReady())
                     return new Dictionary<object, object>();
 
+                if (System.Web.HttpContext.Current != null)
+                    return System.Web.HttpContext.Current.Items;
+
                 return CallContext.LogicalGetData(_key) as IDictionary;
             }
             catch (NotImplementedException)
@@ -60,10 +71,14 @@ namespace ServiceStack
                 //Fixed in Mono master: https://github.com/mono/mono/pull/817
                 return CallContext.GetData(_key) as IDictionary;
             }
+#else
+            return AsyncRequestItems.Value;
+#endif
         }
 
         private IDictionary CreateItems(IDictionary items = null)
         {
+#if !NETSTANDARD1_6
             try
             {
                 if (UseThreadStatic)
@@ -81,6 +96,9 @@ namespace ServiceStack
                 CallContext.SetData(_key, items ?? (items = new ConcurrentDictionary<object, object>()));
             }
             return items;
+#else
+            return AsyncRequestItems.Value = items ?? new Dictionary<object, object>();
+#endif
         }
 
         public T GetOrCreate<T>(Func<T> createFn)
@@ -93,10 +111,14 @@ namespace ServiceStack
 
         public void EndRequest()
         {
+#if !NETSTANDARD1_6
             if (UseThreadStatic)
                 Items = null;
             else
                 CallContext.FreeNamedDataSlot(_key);
+#else
+            AsyncRequestItems.Value = null;
+#endif
         }
 
         /// <summary>
@@ -140,7 +162,9 @@ namespace ServiceStack
         }
     }
 
+#if !NETSTANDARD1_6
     [Serializable]
+#endif
     public class DispsableTracker : IDisposable
     {
         public static ILog Log = LogManager.GetLogger(typeof(RequestContext));

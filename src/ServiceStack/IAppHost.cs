@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Reflection;
 using System.Web;
 using ServiceStack.Configuration;
 using ServiceStack.Host;
 using ServiceStack.Host.Handlers;
 using ServiceStack.Html;
 using ServiceStack.IO;
+using ServiceStack.Messaging;
 using ServiceStack.Web;
 
 namespace ServiceStack
@@ -88,6 +90,36 @@ namespace ServiceStack
         List<Action<IRequest, IResponse, object>> GlobalMessageResponseFilters { get; }
 
         /// <summary>
+        /// Add Request Filter for a specific Request DTO Type
+        /// </summary>
+        void RegisterTypedRequestFilter<T>(Action<IRequest, IResponse, T> filterFn);
+
+        /// <summary>
+        /// Add Request Filter for a specific Response DTO Type
+        /// </summary>
+        void RegisterTypedResponseFilter<T>(Action<IRequest, IResponse, T> filterFn);
+
+        /// <summary>
+        /// Add Request Filter for a specific MQ Request DTO Type
+        /// </summary>
+        void RegisterTypedMessageRequestFilter<T>(Action<IRequest, IResponse, T> filterFn);
+
+        /// <summary>
+        /// Add Request Filter for a specific MQ Response DTO Type
+        /// </summary>
+        void RegisterTypedMessageResponseFilter<T>(Action<IRequest, IResponse, T> filterFn);
+
+        /// <summary>
+        /// Add Request Filter for Service Gateway Requests
+        /// </summary>
+        List<Action<IRequest, object>> GatewayRequestFilters { get; }
+
+        /// <summary>
+        /// Add Response Filter for Service Gateway Responses
+        /// </summary>
+        List<Action<IRequest, object>> GatewayResponseFilters { get; }
+
+        /// <summary>
         /// Add alternative HTML View Engines
         /// </summary>
         List<IViewEngine> ViewEngines { get; }
@@ -153,6 +185,11 @@ namespace ServiceStack
         void RegisterService(Type serviceType, params string[] atRestPaths);
 
         /// <summary>
+        /// Register all Services in Assembly
+        /// </summary>
+        void RegisterServicesInAssembly(Assembly assembly);
+
+        /// <summary>
         /// List of pre-registered and user-defined plugins to be enabled in this AppHost
         /// </summary>
         List<IPlugin> Plugins { get; }
@@ -190,6 +227,16 @@ namespace ServiceStack
         /// The Request is provided when exists.
         /// </summary>
         string ResolveLocalizedString(string text, IRequest request);
+
+        /// <summary>
+        /// Execute MQ Message in ServiceStack
+        /// </summary>
+        object ExecuteMessage(IMessage mqMessage);
+
+        /// <summary>
+        /// Access Service Controller for ServiceStack
+        /// </summary>
+        ServiceController ServiceController { get; }
     }
 
     public interface IHasAppHost

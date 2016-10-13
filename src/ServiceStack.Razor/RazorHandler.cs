@@ -40,13 +40,14 @@ namespace ServiceStack.Razor
                 httpReq.Items.TryGetValue("Model", out model);
             if (model == null)
             {
-                var modelType = RazorPage != null ? RazorPage.ModelType : null;
+                var modelType = RazorPage?.ModelType;
                 model = modelType == null || modelType == typeof(DynamicRequestObject)
                     ? null
                     : DeserializeHttpRequest(modelType, httpReq, httpReq.ContentType);
             }
 
             RazorFormat.ProcessRazorPage(httpReq, contentPage, model, httpRes);
+            httpRes.EndHttpHandlerRequest(skipHeaders:true);
         }
 
         public override object CreateRequest(IRequest request, string operationName)

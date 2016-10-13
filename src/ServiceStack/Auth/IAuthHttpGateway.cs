@@ -1,6 +1,5 @@
 using System;
 using System.Net;
-using ServiceStack.Text;
 
 namespace ServiceStack.Auth
 {
@@ -39,7 +38,7 @@ namespace ServiceStack.Auth
                     oauthToken.OAuthProvider, oauthToken.AccessToken, oauthToken.AccessTokenSecret, HttpMethods.Get, uri, null);
             }
 
-            using (var webRes = webReq.GetResponse())
+            using (var webRes = PclExport.Instance.GetResponse(webReq))
                 return webRes.ReadToEnd();
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
@@ -62,27 +63,17 @@ namespace ServiceStack.Auth
         public static ICollection<string> GetRoles(this IAuthRepository UserAuthRepo, IUserAuth userAuth)
         {
             var managesRoles = UserAuthRepo as IManageRoles;
-            if (managesRoles != null)
-            {
-                return managesRoles.GetRoles(userAuth.Id.ToString());
-            }
-            else
-            {
-                return userAuth.Roles;
-            }
+            return managesRoles != null 
+                ? managesRoles.GetRoles(userAuth.Id.ToString()) 
+                : userAuth.Roles;
         }
 
         public static ICollection<string> GetPermissions(this IAuthRepository UserAuthRepo, IUserAuth userAuth)
         {
             var managesRoles = UserAuthRepo as IManageRoles;
-            if (managesRoles != null)
-            {
-                return managesRoles.GetPermissions(userAuth.Id.ToString());
-            }
-            else
-            {
-                return userAuth.Permissions;
-            }
+            return managesRoles != null 
+                ? managesRoles.GetPermissions(userAuth.Id.ToString()) 
+                : userAuth.Permissions;
         }
 
         public static void PopulateSession(this IAuthSession session, IUserAuth userAuth, List<IAuthTokens> authTokens)
@@ -142,24 +133,57 @@ namespace ServiceStack.Auth
             manageRoles.UnAssignRoles(userAuthId.ToString(CultureInfo.InvariantCulture), roles, permissions);
         }
 
+        static IUserAuthRepository AssertUserAuthRepository(this IAuthRepository repo)
+        {
+            var userRepo = repo as IUserAuthRepository;
+            if (userRepo == null)
+                throw new NotSupportedException("This operation requires a IUserAuthRepository");
+
+            return userRepo;
+        }
+
         public static IUserAuth CreateUserAuth(this IAuthRepository authRepo, IUserAuth newUser, string password)
         {
-            return ((IUserAuthRepository)authRepo).CreateUserAuth(newUser, password);
+            return authRepo.AssertUserAuthRepository().CreateUserAuth(newUser, password);
         }
 
         public static IUserAuth UpdateUserAuth(this IAuthRepository authRepo, IUserAuth existingUser, IUserAuth newUser, string password)
         {
-            return ((IUserAuthRepository)authRepo).UpdateUserAuth(existingUser, newUser, password);
+            return authRepo.AssertUserAuthRepository().UpdateUserAuth(existingUser, newUser, password);
         }
 
         public static IUserAuth GetUserAuth(this IAuthRepository authRepo, string userAuthId)
         {
-            return ((IUserAuthRepository)authRepo).GetUserAuth(userAuthId);
+            return authRepo.AssertUserAuthRepository().GetUserAuth(userAuthId);
         }
 
         public static void DeleteUserAuth(this IAuthRepository authRepo, string userAuthId)
         {
-            ((IUserAuthRepository)authRepo).DeleteUserAuth(userAuthId);
+            authRepo.AssertUserAuthRepository().DeleteUserAuth(userAuthId);
+        }
+
+        public static void ValidateNewUser(this IUserAuth newUser)
+        {
+            if (newUser.UserName.IsNullOrEmpty() && newUser.Email.IsNullOrEmpty())
+                throw new ArgumentNullException(ErrorMessages.UsernameOrEmailRequired);
+
+            if (!newUser.UserName.IsNullOrEmpty() && !HostContext.GetPlugin<AuthFeature>().IsValidUsername(newUser.UserName))
+                throw new ArgumentException(ErrorMessages.IllegalUsername, "UserName");
+        }
+
+        public static void ValidateNewUser(this IUserAuth newUser, string password)
+        {
+            newUser.ThrowIfNull("newUser");
+            password.ThrowIfNullOrEmpty("password");
+
+            if (newUser.UserName.IsNullOrEmpty() && newUser.Email.IsNullOrEmpty())
+                throw new ArgumentNullException(ErrorMessages.UsernameOrEmailRequired);
+
+            if (!newUser.UserName.IsNullOrEmpty())
+            {
+                if (!HostContext.GetPlugin<AuthFeature>().IsValidUsername(newUser.UserName))
+                    throw new ArgumentException(ErrorMessages.IllegalUsername, "UserName");
+            }
         }
     }
 }
